@@ -132,9 +132,7 @@ describe("Sign Up Page", () => {
       await setup();
 
       await userEvent.click(button);
-      await screen.findByText(
-        "Please check your e-mail to activate your account"
-      );
+      await screen.findByText(en.accountActivationNotification);
 
       expect(requestBody).toEqual({
         username: "user1",
@@ -149,9 +147,7 @@ describe("Sign Up Page", () => {
       await userEvent.click(button);
       await userEvent.click(button);
 
-      await screen.findByText(
-        "Please check your e-mail to activate your account"
-      );
+      await screen.findByText(en.accountActivationNotification);
 
       expect(counter).toBe(1);
     });
@@ -176,18 +172,14 @@ describe("Sign Up Page", () => {
 
       await userEvent.click(button);
 
-      const text = await screen.findByText(
-        "Please check your e-mail to activate your account"
-      );
+      const text = await screen.findByText(en.accountActivationNotification);
 
       expect(text).toBeInTheDocument();
     });
 
     it("does not display account activation message before sign up request", async () => {
       await setup();
-      const text = screen.queryByText(
-        "Please check your e-mail to activate your account"
-      );
+      const text = screen.queryByText(en.accountActivationNotification);
       expect(text).not.toBeInTheDocument();
     });
 
@@ -201,9 +193,7 @@ describe("Sign Up Page", () => {
 
       await userEvent.click(button);
 
-      const text = screen.queryByText(
-        "Please check your e-mail to activate your account"
-      );
+      const text = screen.queryByText(en.accountActivationNotification);
 
       expect(text).not.toBeInTheDocument();
     });
@@ -327,8 +317,8 @@ describe("Sign Up Page", () => {
       englishLanguage = screen.queryByTitle("English");
       password = screen.queryByLabelText(en.password);
       passwordRepeat = screen.queryByLabelText(en.passwordRepeat);
-      passwordRepeat = screen.queryByLabelText(en.username);
-      passwordRepeat = screen.queryByLabelText(en.email);
+      username = screen.queryByLabelText(en.username);
+      email = screen.queryByLabelText(en.email);
       button = screen.queryByRole("button", { name: en.signUp });
     };
 
@@ -351,7 +341,7 @@ describe("Sign Up Page", () => {
       expect(screen.queryByLabelText(en.passwordRepeat)).toBeInTheDocument();
     });
 
-    it("displays all text in portuguese after selecing that language", async () => {
+    it("displays all text in portuguese after selecting that language", async () => {
       setup();
 
       await userEvent.click(portugueseLanguage);
@@ -399,35 +389,31 @@ describe("Sign Up Page", () => {
     });
 
     it("sends accept-language having en to backend for sign up request ", async () => {
-      setup();
+      await setup();
 
       await userEvent.type(username, "user1");
       await userEvent.type(email, "user1@mail.com");
       await userEvent.type(password, "p4assword");
       await userEvent.type(passwordRepeat, "p4assword");
       await userEvent.click(button);
-      await screen.queryByText(
-        "Please check your e-mail to activate your account"
-      );
+      await screen.queryByText(en.accountActivationNotification);
 
       expect(acceptLanguageHeader).toBe("en");
     });
 
-    // it("sends accept-language having tr after that language is selected", async () => {
-    //   setup();
+    it("sends accept-language having ptbr after that language is selected", async () => {
+      setup();
 
-    //   await userEvent.click(portugueseLanguage);
-    //   await userEvent.type(username, "user1");
-    //   await userEvent.type(email, "user1@mail.com");
-    //   await userEvent.type(password, "p4assword");
-    //   await userEvent.type(passwordRepeat, "p4assword");
-    //   await userEvent.click(button);
-    //   await screen.queryByText(
-    //     "Please check your e-mail to activate your account"
-    //   );
+      await userEvent.click(portugueseLanguage);
+      await userEvent.type(username, "user1");
+      await userEvent.type(email, "uzaer1@mail.com");
+      await userEvent.type(password, "P4ssword");
+      await userEvent.type(passwordRepeat, "P4ssword");
+      await userEvent.click(button);
+      await screen.findByText(ptbr.accountActivationNotification);
 
-    //   expect(acceptLanguageHeader).toBe("tr");
-    // });
+      expect(acceptLanguageHeader).toBe("ptbr");
+    });
 
     it("displays account activation information in Portuguese after selecting that language", async () => {
       setup();
@@ -436,8 +422,8 @@ describe("Sign Up Page", () => {
 
       await userEvent.type(username, "user1");
       await userEvent.type(email, "user1@mail.com");
-      await userEvent.type(password, "p4assword");
-      await userEvent.type(passwordRepeat, "p4assword");
+      await userEvent.type(password, "P4ssword");
+      await userEvent.type(passwordRepeat, "P4ssword");
       await userEvent.click(button);
       const accountActivation = await screen.findByText(
         ptbr.accountActivationNotification
