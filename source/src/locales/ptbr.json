@@ -1,0 +1,9 @@
+{
+  "signUp": "Inscrever-se",
+  "username": "Usuário",
+  "email": "E-mail",
+  "password": "Senha",
+  "passwordRepeat": "Repetir Senha",
+  "passwordMismatchValidation": "Senhas não são iguais",
+  "accountActivationNotification": "Por favor, verifique o seu e-mail para ativar sua conta"
+}
