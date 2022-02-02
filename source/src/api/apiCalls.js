@@ -1,7 +1,7 @@
 import axios from "axios";
 import i18n from "../locales/i18n";
 
-const signUp = (body) => {
+export const signUp = (body) => {
   return axios.post("/api/1.0/users", body, {
     headers: {
       "Accept-Language": i18n.global.locale,
@@ -9,4 +9,6 @@ const signUp = (body) => {
   });
 };
 
-export { signUp };
+export const activate = (token) => {
+  return axios.post(`/api/1.0/users/token/${token}`);
+};

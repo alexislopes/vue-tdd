@@ -3,7 +3,6 @@ import { render, screen, waitFor } from "@testing-library/vue";
 import userEvent from "@testing-library/user-event";
 import { setupServer } from "msw/node";
 import { rest } from "msw";
-import "@testing-library/jest-dom";
 import i18n from "../locales/i18n";
 import en from "../locales/en.json";
 import ptbr from "../locales/ptbr.json";
@@ -321,10 +320,6 @@ describe("Sign Up Page", () => {
       email = screen.queryByLabelText(en.email);
       button = screen.queryByRole("button", { name: en.signUp });
     };
-
-    afterEach(() => {
-      i18n.global.locale = "en";
-    });
 
     it("initially displays all text in english", async () => {
       setup();
