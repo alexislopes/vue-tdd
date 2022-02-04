@@ -1,5 +1,13 @@
 <template>
   <div data-testId="home-page">
-    <h1>Home Page</h1>
+    <UserList />
   </div>
 </template>
+<script>
+import UserList from "../components/UserList.vue";
+export default {
+  components: {
+    UserList,
+  },
+};
+</script>

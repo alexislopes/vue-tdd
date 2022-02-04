@@ -1,5 +1,5 @@
 <template>
-  <div class="shadow-sm bg-light"></div>
+  <div class="shadow-sm bg-light mb-3"></div>
   <nav class="navbar navbar-expand navbar-light container">
     <div class="container-fluid p-0">
 
