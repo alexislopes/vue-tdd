@@ -11,6 +11,21 @@
         :key="user.id"
       >{{user.username}}</li>
     </ul>
+
+    <div class="card-footer">
+      <button
+        class="btn btn-outline-secondary btn-sm"
+        @click="loadData(page.page - 1)"
+        v-if="page.page === 1"
+      > &lt; previous</button>
+      <button
+        class="btn btn-outline-secondary btn-sm float-end"
+        v-if="page.totalPages > page.page + 1"
+        @click="loadData(page.page + 1)"
+      >next &gt; </button>
+
+    </div>
+
   </div>
 </template>
 <script>
@@ -26,10 +41,15 @@ export default {
       },
     };
   },
+  methods: {
+    async loadData(pageIndex) {
+      const response = await loadUsers(pageIndex);
+      this.page = response.data;
+    },
+  },
   async mounted() {
     try {
-      const response = await loadUsers();
-      this.page = response.data;
+      this.loadData(0);
     } catch (error) {
       console.log("🚀 ~ file: UserList.vue ~ line 26 ~ mounted ~ error", error);
     }
