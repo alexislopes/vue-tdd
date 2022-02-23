@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-header text-center">
-      <h3>Users</h3>
+      <h3>{{$t('users')}}</h3>
     </div>
     <ul class="list-group list-group-flush">
 
@@ -9,20 +9,27 @@
         class="list-group-item list-group-item-action"
         v-for="user in page.content"
         :key="user.id"
-      >{{user.username}}</li>
+        @click="$router.push(`/user/${user.id}`)"
+      >
+        <UserListItem :user="user" />
+      </li>
     </ul>
 
-    <div class="card-footer">
+    <div class="card-footer text-center">
       <button
-        class="btn btn-outline-secondary btn-sm"
+        class="btn btn-outline-secondary btn-sm float-start"
         @click="loadData(page.page - 1)"
-        v-if="page.page === 1"
-      > &lt; previous</button>
+        v-show="page.page !== 0 && !pendingApiCall"
+      > {{$t('previousPage')}}</button>
       <button
         class="btn btn-outline-secondary btn-sm float-end"
-        v-if="page.totalPages > page.page + 1"
+        v-show="page.totalPages > page.page + 1 && !pendingApiCall"
         @click="loadData(page.page + 1)"
-      >next &gt; </button>
+      >{{$t('nextPage')}} </button>
+      <Spinner
+        v-show="pendingApiCall"
+        size="normal"
+      />
 
     </div>
 
@@ -30,6 +37,8 @@
 </template>
 <script>
 import { loadUsers } from "../api/apiCalls";
+import UserListItem from "./UserListItem.vue";
+import Spinner from "./Spinner";
 export default {
   data() {
     return {
@@ -39,12 +48,15 @@ export default {
         size: 0,
         totalPages: 0,
       },
+      pendingApiCall: true,
     };
   },
   methods: {
     async loadData(pageIndex) {
+      this.pendingApiCall = true;
       const response = await loadUsers(pageIndex);
       this.page = response.data;
+      this.pendingApiCall = false;
     },
   },
   async mounted() {
@@ -54,5 +66,12 @@ export default {
       console.log("🚀 ~ file: UserList.vue ~ line 26 ~ mounted ~ error", error);
     }
   },
+  components: { UserListItem, Spinner },
 };
 </script>
+
+<style scoped>
+lt {
+  cursor: pointer;
+}
+</style>

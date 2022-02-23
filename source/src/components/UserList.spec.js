@@ -3,6 +3,11 @@ import { render, screen } from "@testing-library/vue";
 import { setupServer } from "msw/node";
 import { rest } from "msw";
 import userEvent from "@testing-library/user-event";
+import router from "../routes/router";
+import en from "../locales/en.json";
+import ptbr from "../locales/ptbr.json";
+import i18n from "../locales/i18n";
+import LanguageSelector from "./LanguageSelector";
 
 const server = setupServer(
   rest.get("/api/1.0/users", (req, res, ctx) => {
@@ -47,22 +52,41 @@ const users = [
   { id: 7, username: "user7", email: "user7@mail.com", image: null },
 ];
 
+const setup = async () => {
+  const app = {
+    components: {
+      UserList,
+      LanguageSelector,
+    },
+    template: `
+<UserList />
+<LanguageSelector />
+`,
+  };
+  render(app, {
+    global: {
+      plugins: [router, i18n],
+    },
+  });
+  await router.isReady();
+};
+
 describe("User List", () => {
   it("displays three users in list", async () => {
-    render(UserList);
+    await setup();
     const users = await screen.findAllByText(/user/);
     expect(users.length).toBe(3);
   });
 
   it("displays next page link", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
     const nextPageLink = screen.queryByText("next >");
-    expect(nextPageLink).toBeInTheDocument();
+    expect(nextPageLink).toBeVisible();
   });
 
   it("displays next page after clicking next", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
     const nextPageLink = screen.queryByText("next >");
     await userEvent.click(nextPageLink);
@@ -71,34 +95,34 @@ describe("User List", () => {
   });
 
   it("hides next page link at last page", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
     await userEvent.click(screen.queryByText("next >"));
     const firstUserOnPage2 = await screen.findByText("user4");
     await userEvent.click(screen.queryByText("next >"));
     await screen.findByText("user7");
 
-    expect(screen.queryByText("next >")).not.toBeInTheDocument();
+    expect(screen.queryByText("next >")).not.toBeVisible();
   });
 
   it("does not display the previous page link in the first page", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
 
-    expect(screen.queryByText("< previous")).not.toBeInTheDocument();
+    expect(screen.queryByText("< previous")).not.toBeVisible();
   });
 
   it("displays previous page link in page 2", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
     await userEvent.click(screen.queryByText("next >"));
     await screen.findByText("user4");
 
-    expect(screen.queryByText("< previous")).toBeInTheDocument();
+    expect(screen.queryByText("< previous")).toBeVisible();
   });
 
   it("displays previous page after click previous page link", async () => {
-    render(UserList);
+    await setup();
     await screen.findByText("user1");
     await userEvent.click(screen.queryByText("next >"));
     await screen.findByText("user4");
@@ -106,5 +130,53 @@ describe("User List", () => {
     const firstUserOnPage1 = await screen.findByText("user1");
 
     expect(firstUserOnPage1).toBeInTheDocument();
+  });
+
+  it("displays spinner during api call is in progress", async () => {
+    await setup();
+    const spinner = screen.queryByRole("status");
+    expect(spinner).toBeVisible();
+  });
+
+  it("hides spinner when api call is completed", async () => {
+    await setup();
+    const spinner = screen.queryByRole("status");
+    await screen.findByText("user1");
+    expect(spinner).not.toBeVisible();
+  });
+
+  it("displays spinner after clicking next", async () => {
+    await setup();
+    await screen.findByText("user1");
+    await userEvent.click(screen.queryByText("next >"));
+    const spinner = screen.queryByRole("status");
+    expect(spinner).toBeVisible();
+  });
+});
+
+describe("Inernationalization", () => {
+  it("initially displays header and navigation links in english", async () => {
+    await setup();
+    await screen.findByText("user1");
+    await userEvent.click(screen.queryByText("next >"));
+    await screen.findByText("user4");
+
+    expect(screen.queryByText(en.users)).toBeInTheDocument();
+    expect(screen.queryByText(en.previousPage)).toBeInTheDocument();
+    expect(screen.queryByText(en.nextPage)).toBeInTheDocument();
+  });
+
+  it("displays header and navigation links in portuguese after selecting that language ", async () => {
+    await setup();
+
+    await screen.findByText("user1");
+    await userEvent.click(screen.queryByText("next >"));
+    await screen.findByText("user4");
+    const portugueseLanguageSelector = screen.queryByTitle("Português");
+    await userEvent.click(portugueseLanguageSelector);
+
+    expect(screen.queryByText(ptbr.previousPage)).toBeInTheDocument();
+    expect(screen.queryByText(ptbr.users)).toBeInTheDocument();
+    expect(screen.queryByText(ptbr.nextPage)).toBeInTheDocument();
   });
 });

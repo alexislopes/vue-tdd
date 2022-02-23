@@ -11,13 +11,33 @@ const server = setupServer(
     return res(ctx.status(200));
   }),
 
-  rest.get("/api/1.0/users/token/:token", (req, res, ctx) => {
+  rest.get("/api/1.0/users", (req, res, ctx) => {
     return res(
       ctx.status({
-        content: [],
+        content: [
+          {
+            id: 1,
+            username: "user-in-list",
+            email: "user-in-list@mail.com",
+            image: null,
+          },
+        ],
         page: 0,
         size: 0,
         totalPages: 0,
+      })
+    );
+  }),
+
+  rest.get("/api/1.0/users/:id", (req, res, ctx) => {
+    const id = Number.parseInt(req.params.id);
+    return res(
+      ctx.status(200),
+      ctx.json({
+        id,
+        username: `user${id}`,
+        email: `user${id}@mail.com`,
+        image: null,
       })
     );
   })
@@ -116,6 +136,14 @@ describe("Routing", () => {
     const image = screen.queryByAltText("Hoaxify Logo");
     await userEvent.click(image);
     const page = await screen.findByTestId("home-page");
+    expect(page).toBeInTheDocument();
+  });
+
+  it("navigates to user page when clicking the username on user list", async () => {
+    await setup("/");
+    const user = await screen.findByText("user-in-list");
+    await userEvent.click(user);
+    const page = await screen.findByTestId("user-page");
     expect(page).toBeInTheDocument();
   });
 });

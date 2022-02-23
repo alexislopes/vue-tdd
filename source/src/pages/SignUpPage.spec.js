@@ -83,7 +83,7 @@ describe("Sign Up Page", () => {
       expect(button).toBeInTheDocument();
     });
 
-    it("disables de button initially", () => {
+    it("disables the button initially", () => {
       setup();
       const button = screen.queryByRole("button", { name: "Sign Up" });
       expect(button).toBeDisabled();
